@@ -15,7 +15,10 @@
   "dependencies": {
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-shell": "^2",
+    "@types/mysql": "^2.15.26",
     "autoprefixer": "^10.4.20",
+    "dotenv": "^16.4.7",
+    "mysql2": "^3.11.5",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.16"
   },
