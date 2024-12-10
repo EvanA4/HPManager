@@ -4,7 +4,4 @@
 
 <div>
 	<Navbar />
-	<div class="bg-white w-[100px] h-[500px]">
-		Welcome to root.
-	</div>
 </div>
