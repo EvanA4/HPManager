@@ -1,9 +1,10 @@
 <script lang="ts">
-  import NumComp from '../components/Num.svelte';
+	import Navbar from '../components/Navbar.svelte';
 </script>
 
-<main>
-  <div class="flex flex-row items-center justify-center h-[100vh] w-[100%]">
-    <NumComp display="HomePages Manager"/>
-  </div>
-</main>
+<div>
+	<Navbar />
+	<div class="bg-white w-[100px] h-[500px]">
+		Welcome to root.
+	</div>
+</div>
