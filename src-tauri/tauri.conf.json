@@ -12,9 +12,9 @@
   "app": {
     "windows": [
       {
-        "title": "hpmanager",
-        "width": 800,
-        "height": 600
+        "title": "HomePages Manager",
+        "width": 1720,
+        "height": 880
       }
     ],
     "security": {
