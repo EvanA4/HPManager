@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Navbar from '../../components/Navbar.svelte';
+	import Navbar from '$lib/components/Navbar.svelte';
 </script>
 
 <!-- <div class="flex flex-row items-center justify-center h-[100vh] w-[100%]">
