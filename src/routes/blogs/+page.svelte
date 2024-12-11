@@ -1,6 +1,19 @@
 
 
 <script lang="ts">
+	import { onMount } from 'svelte';
+	import Navbar from '$lib/components/Navbar.svelte';
+	import NewBlog from '$lib/components/NewBlog.svelte';
+	import blogImg from '../../public/blogs.png';
+
+
+	interface NewBlogObj {
+		title: string;
+		summary: string;
+		content: string;
+	}
+
+
 	interface BlogSnippet {
 		id: number;
 		title: string;
@@ -8,11 +21,6 @@
 		posted: string;
 	}
 
-  	import { onMount } from 'svelte';
-	import Navbar from '$lib/components/Navbar.svelte';
-	import NewBlog from '$lib/components/NewBlog.svelte';
-	import blogImg from '../../public/blogs.png'
-  import { hide } from '@tauri-apps/api/app';
 
 	async function getprom() {
 		let myprom = await fetch('/api/blogs');
@@ -20,10 +28,17 @@
 		return await myblob.text();
 	}
 
+
 	let snippets = $state<BlogSnippet[]>([]);
 	let searchText = $state<string>("");
 	let hideNewBlog = $state<boolean>(true);
+	let blogObj = $state<NewBlogObj>({
+		title: "",
+		summary: "",
+		content: ""
+	})
 	
+
 	onMount(async () => {
 		let raw: BlogSnippet[] = JSON.parse(await getprom())[0];
 
@@ -45,16 +60,19 @@
 		}
 	})
 
+
 	function changeToHide() {
 		hideNewBlog = !hideNewBlog;
 	}
+
+
 
 </script>
 
 
 <div class="relative">
 	<Navbar />
-	<NewBlog hidden={hideNewBlog} changeToHide={changeToHide}/>
+	<NewBlog hidden={hideNewBlog} changeToHide={changeToHide} blogObj={blogObj}/>
 
 	<div class='w-[100%] my-[4vh] flex flex-col justify-center items-center p-3 relative'>
 		<img src={blogImg} alt="blog display">
@@ -71,6 +89,9 @@
 		<button
 			id="openBtn"
 			onclick={() => {
+				blogObj.title = ""
+				blogObj.summary = ""
+				blogObj.content = ""
 				if (hideNewBlog) changeToHide();
 			}}
 			class='bg-green-500 hover:bg-green-400 text-white px-3 rounded-[10px]'
@@ -79,14 +100,22 @@
 
 	<div class='flex flex-col gap-[25px] w-[100%] justify-center items-center px-5 pb-[50px] pt-[50px]'>
 		{#each snippets as snippet}
-			<a href={'blogs/' + snippet.title.replaceAll(' ', '+')} class='w-[100%] z-20'>
-				<div class='text-white p-3 border-white border-2 rounded-[15px] bg-black'>
-					<p class='text-lg'><b>{snippet.title}</b></p>
-					<p class='text-neutral-300'>{snippet.posted}</p>
-					<br/>
-					<p>{snippet.summary}</p>
+			<button
+			id="openBtn"
+				onclick={() => {
+					blogObj.title = snippet.title
+					blogObj.summary = snippet.summary
+					if (hideNewBlog) changeToHide();
+				}}
+				class='w-[100%] z-20 text-start'
+			>
+				<div id="openBtn" class='text-white p-3 border-white border-2 rounded-[15px] bg-black'>
+					<p id="openBtn" class='text-lg'><b>{snippet.title}</b></p>
+					<p id="openBtn" class='text-neutral-300'>{snippet.posted}</p>
+					<br id="openBtn"/>
+					<p id="openBtn">{snippet.summary}</p>
 				</div>
-			</a>
+			</button>
 		{/each}
 	</div>
 </div>

@@ -10,7 +10,7 @@ function outside(node: Node, listener: string, callback: (node: Event) => void) 
     
     const handleClick = (event: Event) => {
         let targ = event.target as HTMLElement;
-        if (node && !node.contains(targ as Node) && !event.defaultPrevented && (targ.id != "openBtn")) {
+        if (node && !node.contains(targ as Node) && !event.defaultPrevented && targ.id != "openBtn") {
             callback(event)
         }
     }

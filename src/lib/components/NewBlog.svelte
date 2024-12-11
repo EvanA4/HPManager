@@ -1,19 +1,20 @@
 <script lang="ts">
 	import { clickOutside } from "$lib/utils/clickOutside";
 
-	interface NewBlog {
+	interface NewBlogObj {
 		title: string;
 		summary: string;
 		content: string;
 	}
 
-	let newblog = $state<NewBlog>({
-		title: "",
-		summary: "",
-		content: ""
+
+	let { hidden, changeToHide, blogObj } = $props()
+	let newblog = $state<NewBlogObj>({
+		title: blogObj.title,
+		summary: blogObj.summary,
+		content: blogObj.content
 	})
 
-	let { hidden, changeToHide } = $props()
 
 	function handleClick() {
 		if (!hidden) changeToHide();
@@ -32,10 +33,14 @@
 			<div class="w-[100%] py-5">
 				<input 
 					type="text" placeholder="Title of Your Blog"
+					value={blogObj.title}
 					oninput={(e: any) => {
 						newblog.title = e.target.value
 					}}
-					class="block bg-transparent text-white border-b-[1px] border-neutral-600 text-3xl focus:border-blue-400 focus:outline-none h-[50px] placeholder-neutral-300"
+					class={
+						"text-white border-neutral-600 focus:border-blue-400 placeholder-neutral-300 " +
+						"block bg-transparent border-b-[1px] text-3xl focus:outline-none h-[50px] w-full"
+					}
 				>
 				<textarea
 					placeholder="Description"
@@ -46,7 +51,7 @@
 						"border-neutral-600 focus:border-blue-400 text-white placeholder-neutral-300 bg-black "
 						+ "w-[100%] mt-5 p-3 block rounded-xl border h-[100px] resize-none outline-none"
 					}
-				></textarea>
+				>{blogObj.summary}</textarea>
 			</div>
 			<textarea
 				placeholder="Content"
@@ -57,7 +62,7 @@
 					"bg-black border border-neutral-600 focus:border-blue-400 text-white placeholder-neutral-300 "
 					+ "w-[100%] h-[50vh] p-3 font-mono outline-none rounded-lg resize-none scrollbar-none"
 				}
-			></textarea>
+			>{blogObj.content}</textarea>
 		</div>
 	
 		<div class="flex gap-10">
