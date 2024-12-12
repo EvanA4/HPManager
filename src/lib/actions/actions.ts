@@ -4,12 +4,12 @@ import { toSQLDate } from "$lib/utils/sqlDate"
 
 export async function GetBlogs(title: string, strict: boolean = false): Promise<Blog[]> {
     // get raw SQL rows for each blog
-    let myprom = await fetch('/api/blogs?' + new URLSearchParams({
+    let res = await fetch('/api/blogs?' + new URLSearchParams({
         title: title,
         strict: (strict ? "true" : "false")
-    }).toString())
-    let rows: BlogRow[] = await myprom.json()
-    let blogs: Blog[] = []
+    }).toString());
+    let rows: BlogRow[] = await res.json();
+    let blogs: Blog[] = [];
 
     // simplify and convert each row into a blog object
     for (let i = 0; i < rows.length; ++i) {
@@ -33,25 +33,38 @@ export async function GetBlogs(title: string, strict: boolean = false): Promise<
 }
 
 
-export async function DeleteBlog(title: string) {
-    let myprom = await fetch('/api/blogs?' + new URLSearchParams({
+export async function DeleteBlog(title: string): Promise<boolean> {
+    // make DELETE request
+    let res = await fetch('/api/blogs?' + new URLSearchParams({
         title: title
     }).toString(), {
         method: "DELETE"
     });
+
+    // return success or failure
+    let rawres = await res.json();
+    if (!rawres) {
+        console.log(`Error: failed to delete blog \"${title}\".`);
+        return false;
+    }
+    return true;
 }
 
 
-export async function PostBlog(blog: Blog) {
+export async function PostBlog(blog: Blog): Promise<boolean> {
+    // delete blog if already exists
     let blogCheck = await GetBlogs(blog.title, true);
     if (blogCheck.length > 0) {
+        console.log("Warning: blog already exists, replacing existing blog.");
         await DeleteBlog(blog.title);
     }
 
-    let sqlStr = ""
-    if (blog.postdate != "") sqlStr = toSQLDate(blog.postdate)
+    // determine proper SQL TimeStamp string
+    let sqlStr = "";
+    if (blog.postdate != "") sqlStr = toSQLDate(blog.postdate);
 
-    let postRes = await fetch("/api/blogs", {
+    // make actual POST request
+    let res = await fetch("/api/blogs", {
         method: "POST",
         body: JSON.stringify({
             title: blog.title,
@@ -59,10 +72,13 @@ export async function PostBlog(blog: Blog) {
             content: blog.content,
             postdate: sqlStr
         })
-    })
-    return postRes.json()
+    });
+
+    // return success or failure
+    let rawres = await res.json();
+    if (!rawres) {
+        console.log(`Error: failed to post blog \"${blog.title}\".`);
+        return false;
+    }
+    return true;
 }
-
-
-// https://restfulapi.net/http-methods/
-// use query params for DELETE requests
