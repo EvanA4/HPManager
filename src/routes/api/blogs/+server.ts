@@ -1,7 +1,7 @@
 import mysql, { type QueryResult, type RowDataPacket } from "mysql2";
 import dotenv from "dotenv"
-import { json } from "@sveltejs/kit";
-import type { InBlog, OutFullBlog } from "$lib/types/types.js";
+import { json, type RequestEvent } from "@sveltejs/kit";
+import type { Blog, BlogRow } from "$lib/types/types.js";
 dotenv.config()
 
 
@@ -13,33 +13,46 @@ var pool = mysql.createPool({
 }).promise();
 
 
-export async function GET(req) {
-	console.log("blogs got a GET request!")
-    let title = req.url.searchParams.get("title")
-	if (title == "") {
-		return json([])
-	}
+export async function GET(req: RequestEvent) {
+	console.log("blogs got a GET request!");
+    let title = req.url.searchParams.get("title");
+	let strict = req.url.searchParams.get("strict") == "true";
 
-	let sql = `SELECT * FROM fullblogs WHERE title="${title}"`
-	const [result, fields] = await pool.query<InBlog[]>(sql);
+	let sql = "SELECT * FROM Blogs ORDER BY postdate DESC"
+	if (title != "" && !strict) sql = `SELECT * FROM Blogs WHERE title LIKE "%${title}%" ORDER BY postdate DESC`
+	else if (title != "" && strict) sql = `SELECT * FROM Blogs WHERE title="${title}" ORDER BY postdate DESC`
+	const [result, fields] = await pool.query<BlogRow[]>(sql);
 	
 	return json(result);
 }
 
 
-export async function POST(req) {
+export async function POST(req: RequestEvent) {
 	console.log("blogs got a POST request!")
-    const body: OutFullBlog = await req.request.json();
+    const body: Blog = await req.request.json();
 
 	try {
-		const sql = `INSERT INTO fullblogs (title, content) VALUES ("${body.title}", "${body.content}")`;
+		let sql = `INSERT INTO Blogs (title, summary, content, postdate) VALUES ("${body.title}", "${body.summary}", "${body.content}", "${body.postdate}")`;
+		if (body.postdate == "") sql = `INSERT INTO Blogs (title, summary, content) VALUES ("${body.title}", "${body.summary}", "${body.content}")`;
 		const [result, fields] = await pool.query(sql);
 	} catch (err) {
-		// console.log(err);
+		console.log(err);
 	}
 
     return json(body);
 }
+
+
+export async function DELETE(req: RequestEvent) {
+	console.log("blogs got a DELETE request!")
+	let title = req.url.searchParams.get("title")
+	if (title == "") return json(0);
+
+	let sql = `DELETE FROM Blogs WHERE title="${title}"`
+	const [result, fields] = await pool.query(sql);
+	return json(result);
+}
+
 
 /*
 '8', 'Whoa, a second title!', '<H1>Here is some content</H1>'

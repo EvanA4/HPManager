@@ -1,28 +1,27 @@
 <script lang="ts">
 	import { PostBlog } from "$lib/actions/actions";
-	import type { OutBlog } from "$lib/types/types";
+	import type { Blog } from "$lib/types/types";
 
 	let {
 		toHide = $bindable(true),
 		newTitle = $bindable(""),
 		newSummary = $bindable(""),
 		newContent = $bindable(""),
-		newPosted = $bindable(""),
+		newPostdate = $bindable(""),
 		refreshSnippets
-	} = $props<{toHide: boolean, newTitle:string, newSummary:string, newContent:string, newPosted:string, refreshSnippets: () => Promise<void>}>()
+	} = $props<{toHide: boolean, newTitle:string, newSummary:string, newContent:string, newPostdate:string, refreshSnippets: () => Promise<void>}>()
 
 	async function handlePost() {
 		if (!(newTitle == "" || newSummary == "" || newContent == "")) {
-			let newBlog: OutBlog = {
+			let newBlog: Blog = {
 				title: $state.snapshot(newTitle),
 				summary: $state.snapshot(newSummary),
 				content: $state.snapshot(newContent),
-				posted: $state.snapshot(newPosted),
-			}
+				postdate: $state.snapshot(newPostdate),
+			};
 
-			let result = await PostBlog(newBlog as OutBlog);
-			await refreshSnippets()
-			toHide = true;
+			let result = await PostBlog(newBlog);
+			await refreshSnippets();
 		}
 	}
 </script>
@@ -66,7 +65,7 @@
 			<!-- Posted -->
 			<input 
 				type="text" placeholder="Date Posted"
-				bind:value={newPosted}
+				bind:value={newPostdate}
 				class={
 					"bg-black border border-neutral-600 focus:border-blue-400 text-white placeholder-neutral-300 "
 					+ "w-[100%] h-[40px] p-3 mt-5 outline-none rounded-lg resize-none scrollbar-none"

@@ -1,60 +1,68 @@
-import type { InBlog, InSnippet, OutBlog } from "$lib/types/types"
+import type { BlogRow, Blog } from "$lib/types/types"
 import { toSQLDate } from "$lib/utils/sqlDate"
 
-export async function GetBlogs(title: string): Promise<InBlog> {
-    let myprom = await fetch('/api/blogs?' + new URLSearchParams({
-        title: title
-    }).toString())
-    let data = await myprom.json()
-    console.log(data)
-    return data
-}
 
-export async function GetSnippets(title: string): Promise<InSnippet[]> {
-    let myprom = await fetch('/api/snippets?' + new URLSearchParams({
-        title: title
+export async function GetBlogs(title: string, strict: boolean = false): Promise<Blog[]> {
+    // get raw SQL rows for each blog
+    let myprom = await fetch('/api/blogs?' + new URLSearchParams({
+        title: title,
+        strict: (strict ? "true" : "false")
     }).toString())
-    let data = await myprom.json()
-    for (let i = 0; i < data.length; ++i) {
-        let newTime = data[i].posted.replaceAll('T', ' ').split('.')[0]
+    let rows: BlogRow[] = await myprom.json()
+    let blogs: Blog[] = []
+
+    // simplify and convert each row into a blog object
+    for (let i = 0; i < rows.length; ++i) {
+        let newTime = rows[i].postdate.replaceAll('T', ' ').split('.')[0];
         let t: any = newTime.split(/[- :]/);
         let dateObj = new Date(Date.UTC(t[0], t[1]-1, t[2], t[3], t[4], t[5]));
         let options: any = { year: 'numeric', month: 'long', day: 'numeric' };
-        let finalStr = dateObj.toLocaleDateString("en-US", options)
-        data[i].posted = finalStr
+        let finalStr = dateObj.toLocaleDateString("en-US", options);
+        
+        let blog: Blog = {
+            title: rows[i].title,
+            summary: rows[i].summary,
+            content: rows[i].content,
+            postdate: finalStr,
+        };
+
+        blogs.push(blog);
     }
-    return data
+
+    return blogs;
 }
 
-export async function PostBlog(blog: OutBlog) {
-    let sqlStr = ""
-    if (blog.posted != "") sqlStr = toSQLDate(blog.posted)
-
-    let snippetRes = await fetch("/api/snippets", {
-        method: "POST",
-        body: JSON.stringify({
-            title: blog.title,
-            summary: blog.summary,
-            posted: sqlStr
-        })
-    })
-    let blogRes = await fetch("/api/blogs", {
-        method: "POST",
-        body: JSON.stringify({
-            title: blog.title,
-            content: blog.content
-        })
-    })
-    return [await snippetRes.json(), await blogRes.json()]
-}
 
 export async function DeleteBlog(title: string) {
-    let myprom = await fetch('/api/snippets?' + new URLSearchParams({
+    let myprom = await fetch('/api/blogs?' + new URLSearchParams({
         title: title
     }).toString(), {
         method: "DELETE"
     });
 }
+
+
+export async function PostBlog(blog: Blog) {
+    let blogCheck = await GetBlogs(blog.title, true);
+    if (blogCheck.length > 0) {
+        await DeleteBlog(blog.title);
+    }
+
+    let sqlStr = ""
+    if (blog.postdate != "") sqlStr = toSQLDate(blog.postdate)
+
+    let postRes = await fetch("/api/blogs", {
+        method: "POST",
+        body: JSON.stringify({
+            title: blog.title,
+            summary: blog.summary,
+            content: blog.content,
+            postdate: sqlStr
+        })
+    })
+    return postRes.json()
+}
+
 
 // https://restfulapi.net/http-methods/
 // use query params for DELETE requests
