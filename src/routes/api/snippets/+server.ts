@@ -1,6 +1,6 @@
 import mysql, { type QueryResult, type RowDataPacket } from "mysql2";
 import dotenv from "dotenv"
-import { json } from "@sveltejs/kit";
+import { json, type RequestEvent } from "@sveltejs/kit";
 import type { OutSnippet } from "$lib/types/types";
 dotenv.config()
 
@@ -21,7 +21,7 @@ interface BlogSnippet extends RowDataPacket {
 }
 
 
-export async function GET(req) {
+export async function GET(req: RequestEvent) {
     console.log("snippets got a GET request!")
     let title = req.url.searchParams.get("title")
 
@@ -35,8 +35,8 @@ export async function GET(req) {
 }
 
 
-export async function POST(req) {
-    console.log("snippets got a POST request!")
+export async function POST(req: RequestEvent) {
+    console.log("snippets got a POST request!", req.constructor.name)
     const body: OutSnippet = await req.request.json();
 
     try {
@@ -51,7 +51,7 @@ export async function POST(req) {
 }
 
 
-export async function DELETE(req) {
+export async function DELETE(req: RequestEvent) {
     console.log("snippets got a DELETE request!")
     let title = req.url.searchParams.get("title")
     if (title == "") return json(0);

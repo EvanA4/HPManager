@@ -1,23 +1,38 @@
-# HPManager
+# sv
 
-The HomePages (HP) Manager is a Tauri-based desktop application for reading and writing experiences and blogs for the HomePages website.
+Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
 
-### ROUTES:
+## Creating a project
 
-- `/`
-    - big ol greeting
-    - ooh ahh fancy
+If you're seeing this, you've probably already done this step. Congrats!
 
-- `/blogs`
-    - just like the same route on the official website
-        - clicking on a blog snippet will take you to the editing page, though!
-    - only exception: an ADD BLOG button that will take you to `/blogs/new`
+```bash
+# create a new project in the current directory
+npx sv create
 
-- `/blogs/[title]`
-    - will give you the editing page for an blog
+# create a new project in my-app
+npx sv create my-app
+```
 
-- `/exp`, `/proj`
-    - view elements
-    - click on element to edit it
-    - option to create entirely new element
-    - while editing/creating element, see it at the side
+## Developing
+
+Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+
+```bash
+npm run dev
+
+# or start the server and open the app in a new browser tab
+npm run dev -- --open
+```
+
+## Building
+
+To create a production version of your app:
+
+```bash
+npm run build
+```
+
+You can preview the production build with `npm run preview`.
+
+> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
