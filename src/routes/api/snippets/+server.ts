@@ -1,6 +1,7 @@
 import mysql, { type QueryResult, type RowDataPacket } from "mysql2";
 import dotenv from "dotenv"
 import { json } from "@sveltejs/kit";
+import type { OutSnippet } from "$lib/types/types";
 dotenv.config()
 
 
@@ -20,9 +21,42 @@ interface BlogSnippet extends RowDataPacket {
 }
 
 
-export async function GET() {
-    const something = await pool.query<BlogSnippet[]>("SELECT * FROM blogsnippets").then((res) => {
+export async function GET(req) {
+    console.log("snippets got a GET request!")
+    let title = req.url.searchParams.get("title")
+
+    let sql = "SELECT * FROM blogsnippets ORDER BY posted DESC"
+    if (title != "") sql = `SELECT * FROM blogsnippets WHERE title LIKE "%${title}%" ORDER BY posted DESC`
+
+    const [result, fields] = await pool.query<BlogSnippet[]>(sql).then((res) => {
         return res;
     });
-    return json(something);
+    return json(result);
+}
+
+
+export async function POST(req) {
+    console.log("snippets got a POST request!")
+    const body: OutSnippet = await req.request.json();
+
+    try {
+        let sql = `INSERT INTO blogsnippets (title, summary) VALUES ("${body.title}", "${body.summary}")`;
+        if (body.posted != "") sql = `INSERT INTO blogsnippets (title, summary, posted) VALUES ("${body.title}", "${body.summary}", "${body.posted}")`;
+        const [result, fields] = await pool.query(sql);
+        
+        return json(result);
+    } catch (err) {
+        json(err);
+    }
+}
+
+
+export async function DELETE(req) {
+    console.log("snippets got a DELETE request!")
+    let title = req.url.searchParams.get("title")
+    if (title == "") return json(0);
+
+    let sql = `DELETE FROM blogsnippets WHERE title="${title}"`
+    const [result, fields] = await pool.query(sql);
+    return json(result);
 }

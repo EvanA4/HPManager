@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Navbar from '$lib/components/Navbar.svelte';
-	import Contruct from '../public/construct.png';
+	import Contruct from '$lib/public/construct.png';
 </script>
 
 <div>
