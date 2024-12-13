@@ -77,7 +77,6 @@
 	
 		<div class="flex gap-10">
 			<button onclick={async () => {
-				console.log("I was clicked!")
 				handlePost()
 			}} class='bg-blue-500 hover:bg-blue-400 text-white px-7 py-3 rounded-[10px] w-min mb-[80px]'>POST</button>
 			<button

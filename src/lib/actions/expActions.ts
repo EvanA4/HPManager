@@ -7,7 +7,9 @@ export async function GetExps(title: string, timeperiod: string, strict: boolean
         title: title,
         timeperiod: timeperiod,
         strict: (strict ? "true" : "false")
-    }).toString());
+    }).toString(), {
+        cache: "no-cache"
+    });
     let rows: ExpRow[] = await res.json();
     let exps: Exp[] = [];
 
@@ -35,7 +37,8 @@ export async function DeleteExp(title: string, timeperiod: string): Promise<bool
         title: title,
         timeperiod: timeperiod
     }).toString(), {
-        method: "DELETE"
+        method: "DELETE",
+        cache: "no-cache"
     });
 
     // return success or failure
@@ -64,7 +67,8 @@ export async function PostExp(exp: NewExp): Promise<boolean> {
     // make actual POST request
     let res = await fetch("/api/experiences", {
         method: "POST",
-        body: JSON.stringify(exp)
+        body: JSON.stringify(exp),
+        cache: "no-cache"
     });
 
     // return success or failure

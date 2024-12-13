@@ -50,7 +50,7 @@
 	<div class='p-3 w-[100%] flex gap-3 justify-center static'>
 		<input type="text" bind:value={searchText} placeholder='Search or scroll!' class='w-[60vw] rounded-full py-3 px-4 text-black z-10'/>
 		<button onclick={async () => {
-			// exps = await GetExps(searchText)
+			exps = await GetExps(searchText, "");
 		}} class='bg-blue-500 hover:bg-blue-400 text-white px-3 rounded-[10px]'>Search</button>
 		<button
 			id="openBtn"
