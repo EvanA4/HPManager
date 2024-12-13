@@ -1,7 +1,7 @@
 import mysql from "mysql2";
 import dotenv from "dotenv";
 import { json, type RequestEvent } from "@sveltejs/kit";
-import type { Exp, ExpRow } from "$lib/types/types.js";
+import type { NewProject, Project, ProjectRow } from "$lib/types/types.js";
 dotenv.config();
 
 
@@ -25,16 +25,15 @@ export async function GET(req: RequestEvent) {
 	*/
 
 	// access search parameters
-	console.log("exp got a GET request!");
+	console.log("projects got a GET request!");
     let title = req.url.searchParams.get("title");
-	let timeperiod = req.url.searchParams.get("timeperiod");
 	let strict = req.url.searchParams.get("strict");
 	let strictBool = strict == "true";
 
 	// check for bad request
 	// - invalid strict parameter
-	// - if strict but only one of the params are defined
-	if ((strict != "true" && strict != "false") || (strictBool && (title == "") != (timeperiod == ""))) {
+	// - if strict but title not defined
+	if ((strict != "true" && strict != "false") || (strictBool && title == "")) {
 		console.log("bad request")
 		return json([], {
 			status: 400
@@ -43,12 +42,12 @@ export async function GET(req: RequestEvent) {
 	
 	// determine query string
 	let sql: string;
-	if (!strictBool) sql = `SELECT * FROM Experiences WHERE title LIKE "%${title}%" ORDER BY title DESC`;
-	else sql = `SELECT * FROM Experiences WHERE title="${title}" AND timeperiod="${timeperiod}" ORDER BY title DESC`;
+	if (!strictBool) sql = `SELECT * FROM Projects WHERE title LIKE "%${title}%" ORDER BY title DESC`;
+	else sql = `SELECT * FROM Projects WHERE title="${title}" ORDER BY title DESC`;
 
 	// try to use the query
 	try {
-		const [result, fields] = await pool.query<ExpRow[]>(sql);
+		const [result, fields] = await pool.query<ProjectRow[]>(sql);
 		return json(result, {
 			status: 200
 		});
@@ -73,18 +72,21 @@ export async function POST(req: RequestEvent) {
 	*/
 
 	// access request body
-	console.log("exp got a POST request!")
-    const body: Exp = await req.request.json();
-	if ((body.title == undefined || body.title == "") || (body.timeperiod == undefined || body.timeperiod == "") || (body.bullets == undefined || body.bullets.length == 0)) {
-		console.log("bad request")
+	console.log("projects got a POST request!");
+    const body: NewProject = await req.request.json();
+	if ((body.title == "") || (body.summary == "")) {
+		console.log("bad request");
 		return json(false, {
 			status: 400
 		});
 	}
 
 	// determine query string
-	let sql = `INSERT INTO Experiences (title, link, timeperiod, bullets) VALUES ("${body.title}", "${body.link}", "${body.timeperiod}", "${body.bullets}")`;
-	if (body.link == "") sql = `INSERT INTO Experiences (title, timeperiod, bullets) VALUES ("${body.title}", "${body.timeperiod}", "${body.bullets}")`;
+	let sql: string;
+	if (body.link == "" && body.flags == "") sql = `INSERT INTO Projects (title, summary) VALUES ("${body.title}", "${body.summary}")`;
+	else if (body.link == "" && body.flags != "") sql = `INSERT INTO Projects (title, summary, flags) VALUES ("${body.title}", "${body.summary}", "${body.flags}")`;
+	else if (body.link != "" && body.flags == "") sql = `INSERT INTO Projects (title, link, summary) VALUES ("${body.title}", "${body.link}", "${body.summary}")`;
+	else sql = `INSERT INTO Projects (title, link, summary, flags) VALUES ("${body.title}", "${body.link}", "${body.summary}", "${body.flags}")`;
 
 	// try to use the query
 	try {
@@ -114,17 +116,16 @@ export async function DELETE(req: RequestEvent) {
 	*/
 
 	// get search parameters
-	console.log("exp got a DELETE request!")
-	let title = req.url.searchParams.get("title")
-	let timeperiod = req.url.searchParams.get("timeperiod")
-	if (title == "" || title == null || timeperiod == "" || timeperiod == null) {
+	console.log("projects got a DELETE request!");
+	let title = req.url.searchParams.get("title");
+	if (title == "") {
 		return json(false, {
 			status: 400
 		});
 	}
 
 	// determine query string
-	let sql = `DELETE FROM Experiences WHERE title="${title}" AND timeperiod="${timeperiod}"`
+	let sql = `DELETE FROM Projects WHERE title="${title}"`;
 
 	// try to use the query
 	try {

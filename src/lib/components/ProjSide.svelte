@@ -1,6 +1,6 @@
 <script lang="ts">
-	// import { PostProj } from "$lib/actions/expActions";
-	import type { Project, NewProject } from "$lib/types/types";
+	import { PostProj } from "$lib/actions/projActions";
+	import type { NewProject } from "$lib/types/types";
 
 	let {
 		toHide = $bindable(true),
@@ -20,7 +20,7 @@
 				flags: $state.snapshot(newFlags),
 			};
 
-			// let result = await PostProjs(newProj);
+			let result = await PostProj(newProj);
 			await refreshProjs();
 		}
 	}
@@ -59,7 +59,7 @@
 				bind:value={newSummary}
 				class={
 					"bg-black border border-neutral-600 focus:border-blue-400 text-white placeholder-neutral-300 "
-					+ "w-[100%] h-[10vh] p-3 mt-5 outline-none rounded-lg resize-none scrollbar-none text-nowrap"
+					+ "w-[100%] h-[10vh] p-3 mt-5 outline-none rounded-lg resize-none scrollbar-none"
 				}
 			></textarea>
 			

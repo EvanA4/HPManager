@@ -1,11 +1,17 @@
 <script lang="ts">
+  	import { DeleteProj, GetProjs } from '$lib/actions/projActions';
   	import Navbar from '$lib/components/Navbar.svelte';
   	import ProjSide from '$lib/components/ProjSide.svelte';
 	import ProjImg from '$lib/public/projects.png';
-	import type { Project, NewProject } from '$lib/types/types';
+	import type { Project } from '$lib/types/types';
+	import { onMount } from 'svelte';
+	import EditImg from "$lib/public/edit.svg";
+	import TrashImg from "$lib/public/wtrash.svg";
+	import CheckImg from "$lib/public/wcheck.svg";
 	
 
 	let hideSidePage = $state(true);
+	let confirmDelete = $state("");
 	let searchText = $state("");
 	let newTitle = $state("");
     let newLink = $state("");
@@ -18,18 +24,16 @@
 	// 	title: "HomePages",
 	// 	link: "https://github.com/EvanA4/HomePages",
 	// 	summary: "My little corner of the internet, a full-stack self-hosted application. Blogs are powered by a MySQL database server, and the site is hosted on my own mini PC!",
-	// 	flags: [
-	// 		"nextjs",
-	// 		"tailwindcss",
-	// 		"typescript",
-	// 		"opengl",
-	// 		"threejs"
-	// 	]
+	// 	flags: ["nextjs","tailwindcss","typescript","opengl","threejs"]
 	// }
 
 	async function refreshProjs() {
-		// projs = GetProjs("");
+		projs = await GetProjs("");
 	}
+
+	onMount(async () => {
+		refreshProjs();
+	})
 </script>
 
 
@@ -49,7 +53,7 @@
   	<div class='p-3 w-[100%] flex gap-3 justify-center static'>
 		<input type="text" bind:value={searchText} placeholder='Search or scroll!' class='w-[60vw] rounded-full py-3 px-4 text-black z-10'/>
 		<button onclick={async () => {
-			//   exps = await GetExps(searchText, "");
+			  projs = await GetProjs(searchText);
 		}} class='bg-blue-500 hover:bg-blue-400 text-white px-3 rounded-[10px]'>Search</button>
 		<button
 			id="openBtn"
@@ -77,6 +81,31 @@
 							{/await}
 						{/each}
 					</div>
+
+					<button onclick={async () => {
+						newTitle = proj.title;
+						newLink = proj.link;
+						newSummary = proj.summary;
+						newFlags = JSON.stringify(proj.flags);
+						hideSidePage = false;
+					}} class="w-[35px] h-[35px] absolute -bottom-[50px] left-[50%] -translate-x-[150%] hover:opacity-75">
+						<img src={EditImg} alt="A Pen">
+					</button>
+					<button onclick={async () => {
+						if (confirmDelete == proj.title) {
+							await DeleteProj(proj.title);
+							await refreshProjs();
+							confirmDelete = "";
+						} else {
+							confirmDelete = proj.title;
+						}
+					}} class="w-[35px] h-[35px] absolute -bottom-[50px] left-[50%] translate-x-[50%] hover:opacity-75">
+						{#if confirmDelete == proj.title}
+							<img src={CheckImg} alt="A Check Mark">
+						{:else}
+							<img src={TrashImg} alt="A Trash Bin">
+						{/if}
+					</button>
 				</div>
 			</div>
 		{/each}
