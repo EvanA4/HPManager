@@ -65,7 +65,7 @@
 		>New Experience</button>
 	</div>
 
-	<div class="p-[80px] flex gap-[40px]">
+	<div class="max-w-[100vw] p-[80px] flex flex-wrap justify-center gap-[40px]">
 		{#each exps as exp}
 			<div class="relative w-min">
 				<button onclick={() => {
