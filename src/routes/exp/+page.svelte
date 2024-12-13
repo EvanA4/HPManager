@@ -1,11 +1,15 @@
 <script lang="ts">
+  	import { DeleteExp, GetExps } from '$lib/actions/expActions';
 	import ExpSide from '$lib/components/ExpSide.svelte';
-import Navbar from '$lib/components/Navbar.svelte';
+	import Navbar from '$lib/components/Navbar.svelte';
 	import TrashImg from '$lib/public/btrash.svg';
+	import CheckImg from '$lib/public/bcheck.svg';
 	import ExpImg from '$lib/public/experiences.png';
   	import { type Exp } from '$lib/types/types';
+  	import { onMount } from 'svelte';
 
 	let hideSidePage = $state(true);
+	let deleteConfirm = $state("");
 	let searchText = $state("");
 	let newTitle = $state("");
 	let newLink = $state("");
@@ -14,19 +18,19 @@ import Navbar from '$lib/components/Navbar.svelte';
 	let exps = $state<Exp[]>([]);
 
 	async function refreshExps() {
-
+		exps = await GetExps("", "");
 	}
+	onMount(() => {
+		refreshExps();
+	})
 
-	let slide = {
-		header: "SULI Intern at ORNL",
-		date: "Summer 2023",
-		bullets: [
-			"Committed changes to group Github repositories",
-			"Presented my contributions at meetings",
-			"Designed object recognition for point clouds",
-			"Utilized the KD-Tree nearest neighbor(s) search algorithm"
-		]
-	};
+/*
+[
+	"exp1 bullet1",
+	"exp1 bullet2",
+	"exp1 bullet3"
+]
+*/
 </script>
 
 
@@ -61,18 +65,46 @@ import Navbar from '$lib/components/Navbar.svelte';
 		>New Experience</button>
 	</div>
 
-
-	<div class='w-[350px] h-[450px] bg-white rounded-[30px] shadow-md p-5 relative'>
-		<p class='text-[25px]'><b>{slide.header}</b></p>
-		<p>{slide.date}</p>
-		<br/>
-		<ul class='list-disc px-5'>
-			{#each slide.bullets as bullet}
-				<li>{bullet}</li>
-			{/each}
-		</ul>
-		<button class="absolute left-[50%] -translate-x-[50%] bottom-[25px] w-[35px] h-[35px] hover:opacity-75">
-			<img src={TrashImg} alt="A Trash Bin">
-		</button>
+	<div class="p-[80px] flex gap-[40px]">
+		{#each exps as exp}
+			<div class="relative w-min">
+				<button onclick={() => {
+					newTitle = exp.title;
+					newLink = exp.link;
+					newTimeperiod = exp.timeperiod;
+					newBullets = JSON.stringify(exp.bullets);
+					if (hideSidePage) hideSidePage = false;
+				}} class='w-[350px] h-[450px] bg-white rounded-[30px] shadow-md p-5 text-start flex flex-col'>
+					{#if exp.link}
+						<a href={exp.link} class='text-[25px]'><b>{exp.title}</b></a>
+					{:else}	
+						<p class='text-[25px]'><b>{exp.title}</b></p>
+					{/if}
+					<p>{exp.timeperiod}</p>
+					<br/>
+					<ul class='list-disc px-5'>
+						{#each exp.bullets as bullet}
+							<li>{bullet}</li>
+						{/each}
+					</ul>
+				</button>
+	
+				<button onclick={async () => {
+					if (deleteConfirm == exp.title + exp.timeperiod) {
+						deleteConfirm = ""
+						await DeleteExp(exp.title, exp.timeperiod)
+						await refreshExps()
+					} else {
+						deleteConfirm = exp.title + exp.timeperiod
+					}
+				}} class="absolute left-[50%] -translate-x-[50%] bottom-[25px] w-[35px] h-[35px] hover:opacity-50">
+					{#if deleteConfirm == exp.title + exp.timeperiod}
+						<img src={CheckImg} alt="A Check Mark">
+					{:else}
+						<img src={TrashImg} alt="A Trash Bin">
+					{/if}
+				</button>
+			</div>
+		{/each}
 	</div>
 </div>

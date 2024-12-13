@@ -30,5 +30,13 @@ export interface Exp {
     title: string;
     link: string;
     timeperiod: string;
+    bullets: string[];
+}
+
+
+export interface NewExp {
+    title: string;
+    link: string;
+    timeperiod: string;
     bullets: string;
 }

@@ -6,7 +6,7 @@
 	import BlogSide from '$lib/components/BlogSide.svelte';
 	import BlogImg from '$lib/public/blogs.png';
 	import TrashImg from '$lib/public/wtrash.svg';
-	import CheckImg from '$lib/public/check.svg';
+	import CheckImg from '$lib/public/wcheck.svg';
   	import type { Blog } from '$lib/types/types';
   	import { DeleteBlog, GetBlogs } from '$lib/actions/blogActions';
 

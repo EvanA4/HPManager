@@ -1,6 +1,6 @@
 <script lang="ts">
-	// import { PostExp } from "$lib/actions/actions";
-	import type { Exp } from "$lib/types/types";
+	import { PostExp } from "$lib/actions/expActions";
+	import type { Exp, NewExp } from "$lib/types/types";
 
 	let {
 		toHide = $bindable(true),
@@ -12,16 +12,16 @@
 	} = $props<{toHide: boolean, newTitle: string, newLink: string, newTimeperiod: string, newBullets: string, refreshExps: () => Promise<void>}>()
 
 	async function handlePost() {
-		if (!(newTitle == "" || newLink == "" || newTimeperiod == "" || newBullets == "")) {
-			let newExp: Exp = {
+		if (!(newTitle == "" || newTimeperiod == "" || newBullets == "")) {
+			let newExp: NewExp = {
 				title: $state.snapshot(newTitle),
 				link: $state.snapshot(newLink),
 				timeperiod: $state.snapshot(newTimeperiod),
 				bullets: $state.snapshot(newBullets),
 			};
 
-			// let result = await PostExp(newExp);
-			// await refreshExps();
+			let result = await PostExp(newExp);
+			await refreshExps();
 		}
 	}
 </script>
@@ -77,6 +77,7 @@
 	
 		<div class="flex gap-10">
 			<button onclick={async () => {
+				console.log("I was clicked!")
 				handlePost()
 			}} class='bg-blue-500 hover:bg-blue-400 text-white px-7 py-3 rounded-[10px] w-min mb-[80px]'>POST</button>
 			<button
