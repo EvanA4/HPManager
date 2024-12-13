@@ -1,25 +1,22 @@
-import type { BlogRow, Blog } from "$lib/types/types"
+import type { BlogRow, Blog, ExpRow } from "$lib/types/types"
 import { toSQLDate } from "$lib/utils/sqlDate"
 
 
-export async function GetBlogs(title: string, strict: boolean = false): Promise<Blog[]> {
+export async function GetExps(title: string, timeperiod: string, strict: boolean = false): Promise<Blog[]> {
     // get raw SQL rows for each blog
-    let res = await fetch('/api/blogs?' + new URLSearchParams({
+    let res = await fetch('/api/exp?' + new URLSearchParams({
         title: title,
+        timeperiod: timeperiod,
         strict: (strict ? "true" : "false")
     }).toString());
-    let rows: BlogRow[] = await res.json();
-    let blogs: Blog[] = [];
+    let rows: ExpRow[] = await res.json();
+    let blogs: Exp[] = [];
 
-    // simplify and convert each row into a blog object
+    // simplify and convert each row into an exp object
     for (let i = 0; i < rows.length; ++i) {
-        let newTime = rows[i].postdate.replaceAll('T', ' ').split('.')[0];
-        let t: any = newTime.split(/[- :]/);
-        let dateObj = new Date(Date.UTC(t[0], t[1]-1, t[2], t[3], t[4], t[5]));
-        let options: any = { year: 'numeric', month: 'long', day: 'numeric' };
-        let finalStr = dateObj.toLocaleDateString("en-US", options);
+        let bulletsArr = JSON.parse(rows[i].bullets);
         
-        let blog: Blog = {
+        let blog: Exp = {
             title: rows[i].title,
             summary: rows[i].summary,
             content: rows[i].content,
@@ -33,7 +30,7 @@ export async function GetBlogs(title: string, strict: boolean = false): Promise<
 }
 
 
-export async function DeleteBlog(title: string): Promise<boolean> {
+export async function DeleteExp(title: string): Promise<boolean> {
     // make DELETE request
     let res = await fetch('/api/blogs?' + new URLSearchParams({
         title: title
@@ -51,12 +48,12 @@ export async function DeleteBlog(title: string): Promise<boolean> {
 }
 
 
-export async function PostBlog(blog: Blog): Promise<boolean> {
+export async function PostExp(blog: Blog): Promise<boolean> {
     // delete blog if already exists
-    let blogCheck = await GetBlogs(blog.title, true);
+    let blogCheck = await GetExps(blog.title, true);
     if (blogCheck.length > 0) {
         console.log("Warning: blog already exists, replacing existing blog.");
-        await DeleteBlog(blog.title);
+        await DeleteExp(blog.title);
     }
 
     // determine proper SQL TimeStamp string

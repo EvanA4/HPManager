@@ -19,8 +19,7 @@ export async function GET(req: RequestEvent) {
 	- [...blogs] if success
 	- [] if failure
 	Status:
-	- 200 if stuff
-	- 404 if no stuff
+	- 200 if success
 	- 400 if bad request
 	- 500 if server error
 	*/
@@ -31,7 +30,7 @@ export async function GET(req: RequestEvent) {
 	let strict = req.url.searchParams.get("strict");
 
 	// check for bad request
-	if (title == null || title == "" || (strict != "true" && strict != "false")) {
+	if (strict != "true" && strict != "false") {
 		return json([], {
 			status: 400
 		});
@@ -39,15 +38,15 @@ export async function GET(req: RequestEvent) {
 	
 	// determine query string
 	let strictBool = strict == "true";
-	let sql = "SELECT * FROM Blogs ORDER BY postdate DESC";
-	if (title != "" && !strictBool) sql = `SELECT * FROM Blogs WHERE title LIKE "%${title}%" ORDER BY postdate DESC`;
-	else if (title != "" && strictBool) sql = `SELECT * FROM Blogs WHERE title="${title}" ORDER BY postdate DESC`;
+	let sql: string;
+	if (!strictBool) sql = `SELECT * FROM Blogs WHERE title LIKE "%${title}%" ORDER BY postdate DESC`;
+	else sql = `SELECT * FROM Blogs WHERE title="${title}" ORDER BY postdate DESC`;
 
 	// try to use the query
 	try {
 		const [result, fields] = await pool.query<BlogRow[]>(sql);
 		return json(result, {
-			status: (result.length > 0 ? 200 : 404)
+			status: 200
 		});
 
 	} catch {

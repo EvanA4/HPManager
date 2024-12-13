@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { PostBlog } from "$lib/actions/actions";
+	import { PostBlog } from "$lib/actions/blogActions";
 	import type { Blog } from "$lib/types/types";
 
 	let {
@@ -8,8 +8,8 @@
 		newSummary = $bindable(""),
 		newContent = $bindable(""),
 		newPostdate = $bindable(""),
-		refreshSnippets
-	} = $props<{toHide: boolean, newTitle:string, newSummary:string, newContent:string, newPostdate:string, refreshSnippets: () => Promise<void>}>()
+		refreshBlogs
+	} = $props<{toHide: boolean, newTitle: string, newSummary: string, newContent: string, newPostdate: string, refreshBlogs: () => Promise<void>}>()
 
 	async function handlePost() {
 		if (!(newTitle == "" || newSummary == "" || newContent == "")) {
@@ -21,7 +21,7 @@
 			};
 
 			let result = await PostBlog(newBlog);
-			await refreshSnippets();
+			await refreshBlogs();
 		}
 	}
 </script>

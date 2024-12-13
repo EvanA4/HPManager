@@ -3,12 +3,12 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import Navbar from '$lib/components/Navbar.svelte';
-	import NewBlog from '$lib/components/BlogSide.svelte';
+	import BlogSide from '$lib/components/BlogSide.svelte';
 	import BlogImg from '$lib/public/blogs.png';
-	import TrashImg from '$lib/public/trash.svg';
+	import TrashImg from '$lib/public/wtrash.svg';
 	import CheckImg from '$lib/public/check.svg';
   	import type { Blog } from '$lib/types/types';
-  	import { DeleteBlog, GetBlogs } from '$lib/actions/actions';
+  	import { DeleteBlog, GetBlogs } from '$lib/actions/blogActions';
 
 
 	let blogs = $state<Blog[]>([]);
@@ -21,7 +21,7 @@
 	let newPostdate = $state<string>("");
 
 
-	async function refreshSnippets() {
+	async function refreshBlogs() {
 		blogs = await GetBlogs("")
 	}
 	
@@ -34,7 +34,7 @@
 
 <div class="relative">
 	<Navbar />
-	<NewBlog bind:toHide={hideSidePage} bind:newTitle={newTitle} bind:newSummary={newSummary} bind:newContent={newContent} bind:newPostdate={newPostdate} refreshSnippets={refreshSnippets}/>
+	<BlogSide bind:toHide={hideSidePage} bind:newTitle={newTitle} bind:newSummary={newSummary} bind:newContent={newContent} bind:newPostdate={newPostdate} refreshBlogs={refreshBlogs}/>
 
 	<div class='w-[100%] my-[4vh] flex flex-col justify-center items-center p-3 relative'>
 		<img src={BlogImg} alt="blog display">
@@ -89,7 +89,7 @@
 					if (deleteConfirm == blog.title) {
 						deleteConfirm = ""
 						await DeleteBlog(blog.title)
-						await refreshSnippets()
+						await refreshBlogs()
 					} else {
 						deleteConfirm = blog.title
 					}
