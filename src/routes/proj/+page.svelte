@@ -67,12 +67,15 @@
 	  	>New Project</button>
   	</div>
 	
-	<div class="max-w-[100vw] p-[80px] flex flex-wrap justify-center gap-[40px]">
+	<div class="max-w-[100vw] p-[80px] flex flex-wrap justify-center gap-x-[40px] gap-y-[80px]">
 		{#each projs as proj}
 			<div class='w-[100%] sm:w-auto h-fit px-[7vw] py-3 sm:p-3 flex justify-center'>
 				<div class='w-[100%] sm:w-[450px] h-[400px] sm:h-[350px] bg-white rounded-[30px] shadow-md p-5 relative'>
-					<a href={proj.link}><p class='text-[25px]'><b>{proj.title}</b></p></a>
-					<br/>
+					{#if proj.link != undefined}
+						<a href={proj.link}><p class='text-[25px]'><b>{proj.title}</b></p></a><br/>
+					{:else}
+						<p class='text-[25px]'><b>{proj.title}</b></p><br/>
+					{/if}
 					<p>{proj.summary}</p>
 					<div class='absolute bottom-[20px] left-0 h-[10vw] max-h-[50px] w-[100%] px-5 flex justify-around'>
 						{#each proj.flags as flag}
@@ -84,9 +87,9 @@
 
 					<button onclick={async () => {
 						newTitle = proj.title;
-						newLink = proj.link;
+						newLink = proj.link == undefined ? "" : proj.link;
 						newSummary = proj.summary;
-						newFlags = JSON.stringify(proj.flags);
+						newFlags = proj.flags == undefined ? "" : JSON.stringify(proj.flags);
 						hideSidePage = false;
 					}} class="w-[35px] h-[35px] absolute -bottom-[50px] left-[50%] -translate-x-[150%] hover:opacity-75">
 						<img src={EditImg} alt="A Pen">
