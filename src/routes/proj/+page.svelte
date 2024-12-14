@@ -112,5 +112,8 @@
 				</div>
 			</div>
 		{/each}
+		{#if projs.length == 0}
+			<p class='text-neutral-300 text-3xl'>No Results</p>
+		{/if}
 	</div>
 </div>

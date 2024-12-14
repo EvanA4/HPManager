@@ -106,5 +106,8 @@
 				</button>
 			</div>
 		{/each}
+		{#if exps.length == 0}
+			<p class='text-neutral-300 text-3xl'>No Results</p>
+		{/if}
 	</div>
 </div>
