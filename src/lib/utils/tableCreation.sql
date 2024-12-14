@@ -34,7 +34,7 @@ DROP TABLE Experiences;
 DROP TABLE Projects;
 
 -- @block
-SELECT * FROM Blogs;
+SELECT * FROM Projects;
 
 -- @block
 INSERT INTO Experiences (title, link, timeperiod, bullets) VALUES ("exp1", "/blogs", "911", "[\"exp1 bullet1\",\"exp1 bullet2\",\"exp1 bullet3\"]")

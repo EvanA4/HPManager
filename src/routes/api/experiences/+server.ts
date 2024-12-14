@@ -26,6 +26,7 @@ export async function GET(req: RequestEvent) {
 
 	// access search parameters
 	console.log("exp got a GET request!");
+	console.log("blalalalalalalalalalalalalalalal");
     let title = req.url.searchParams.get("title");
 	let timeperiod = req.url.searchParams.get("timeperiod");
 	let strict = req.url.searchParams.get("strict");
