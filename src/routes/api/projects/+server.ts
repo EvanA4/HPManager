@@ -42,8 +42,8 @@ export async function GET(req: RequestEvent) {
 	
 	// determine query string
 	let sql: string;
-	if (!strictBool) sql = `SELECT * FROM Projects WHERE title LIKE "%${title}%" ORDER BY title DESC`;
-	else sql = `SELECT * FROM Projects WHERE title="${title}" ORDER BY title DESC`;
+	if (!strictBool) sql = `SELECT * FROM Projects WHERE title LIKE "%${title}%" ORDER BY title ASC`;
+	else sql = `SELECT * FROM Projects WHERE title="${title}" ORDER BY title ASC`;
 
 	// try to use the query
 	try {

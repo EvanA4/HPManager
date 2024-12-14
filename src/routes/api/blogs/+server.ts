@@ -89,6 +89,7 @@ export async function POST(req: RequestEvent) {
 		});
 
 	} catch (err) {
+		console.log(err);
 		return json(false, {
 			status: 500
 		});
